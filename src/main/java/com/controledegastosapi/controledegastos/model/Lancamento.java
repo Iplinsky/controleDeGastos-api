@@ -32,7 +32,6 @@ public class Lancamento implements Serializable {
 	@Column(name = "DATA_VENCIMENTO")
 	private LocalDate dataVencimento;
 
-	@NotNull
 	@Column(name = "DATA_PAGAMENTO")
 	private LocalDate dataPagamento;
 

@@ -22,6 +22,5 @@ public interface ICategoriaRepository extends JpaRepository<Categoria, Long> {
 	
 	List<Categoria> findByNome(String nome);
 	
-	List<Categoria> findByNomeContaining(String texto);
-
+	List<Categoria> findByNomeContaining(String nome);
 }

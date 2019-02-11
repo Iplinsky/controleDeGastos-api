@@ -11,4 +11,3 @@ public class ControledegastosapiApplication {
 		SpringApplication.run(ControledegastosapiApplication.class, args);
 	}
 }
- 

@@ -25,7 +25,7 @@ public class Pessoa implements Serializable {
 	private Long codigo;
 
 	@NotNull
-	@Size(min = 3, max = 50)
+	@Size(min = 2, max = 50)
 	private String nome;
 
 	@NotNull

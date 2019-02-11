@@ -13,20 +13,20 @@ public class Endereco implements Serializable {
 	@NotNull
 	@Size(min = 2, max = 30)
 	private String logradouro;
-	
+
 	@NotNull
 	private Integer numero;
-	
-	@NotNull 
+
+	@NotNull
 	@Size(min = 3, max = 30)
 	private String complemento;
 
 	@NotNull
-	@Size(min = 5, max = 30)
+	@Size(min = 2, max = 30)
 	private String bairro;
 
 	@NotNull
-	@Size(min = 8, max = 8)
+	@Size(min = 8, max = 10)
 	private String cep;
 
 	@NotNull
@@ -34,7 +34,9 @@ public class Endereco implements Serializable {
 	private String estado;
 
 	@NotNull
-	@Size(min = 2, max = 30)
+	@Size(min = 5, max = 30)
+	private String cidade;
+
 	public String getLogradouro() {
 		return logradouro;
 	}
@@ -83,12 +85,21 @@ public class Endereco implements Serializable {
 		this.estado = estado;
 	}
 
+	public String getCidade() {
+		return cidade;
+	}
+
+	public void setCidade(String cidade) {
+		this.cidade = cidade;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((bairro == null) ? 0 : bairro.hashCode());
 		result = prime * result + ((cep == null) ? 0 : cep.hashCode());
+		result = prime * result + ((cidade == null) ? 0 : cidade.hashCode());
 		result = prime * result + ((complemento == null) ? 0 : complemento.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((logradouro == null) ? 0 : logradouro.hashCode());
@@ -114,6 +125,11 @@ public class Endereco implements Serializable {
 			if (other.cep != null)
 				return false;
 		} else if (!cep.equals(other.cep))
+			return false;
+		if (cidade == null) {
+			if (other.cidade != null)
+				return false;
+		} else if (!cidade.equals(other.cidade))
 			return false;
 		if (complemento == null) {
 			if (other.complemento != null)
