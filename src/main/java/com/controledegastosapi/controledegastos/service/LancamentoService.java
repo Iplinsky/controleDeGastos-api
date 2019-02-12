@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.controledegastosapi.controledegastos.ExceptionHandler.PessoaInexistenteOuInativaException;
 import com.controledegastosapi.controledegastos.model.Lancamento;
 import com.controledegastosapi.controledegastos.model.Pessoa;
+import com.controledegastosapi.controledegastos.model.Status;
 import com.controledegastosapi.controledegastos.model.TipoLancamento;
 import com.controledegastosapi.controledegastos.repositoy.ILancamentoRepository;
 import com.controledegastosapi.controledegastos.repositoy.IPessoaRepository;
@@ -29,7 +30,11 @@ public class LancamentoService {
 
 	public Lancamento salvar(Lancamento lancamento) {
 		Pessoa pessoa = pessoaRepository.findById(lancamento.getPessoa().getCodigo()).orElse(null);
-		if (pessoa == null || pessoa.isInativo()) {
+		Status status;
+		if (pessoa == null) {
+			throw new PessoaInexistenteOuInativaException();
+		}
+		if (pessoa.setStatus(Status.INATIVO)){
 			throw new PessoaInexistenteOuInativaException();
 		}
 		return lancamentoRepository.save(lancamento);
@@ -49,7 +54,7 @@ public class LancamentoService {
 		return lancamentoRepository.findById(codigo).orElse(null);
 	}
 
-	public Page<Lancamento> listarPaginado(int elementosPorPagina, int pagina, String texto, Long codigo,
+	public Page<Lancamento> listarPaginado(Integer elementosPorPagina, Integer pagina, String texto, Long codigo,
 			String descricao, String tipo, Long categoriaCodigo, Long pessoaCodigo) {
 		Pageable pageable = PageRequest.of(pagina - 1, elementosPorPagina);
 		descricao = descricao == null ? descricao : descricao.concat("%");
@@ -70,7 +75,7 @@ public class LancamentoService {
 //	public List<Lancamento> listarPorTermo(String texto) {
 //		texto = new String(Base64.getDecoder().decode(texto));
 //		return lancamentoRepository.findByNomeContaining(texto);
-//	}
+//	} 	
 
 	private Lancamento verificarLancamento(Long codigo) {
 		Lancamento lancamentoSalvo = buscarPeloCodigo(codigo);
@@ -79,6 +84,5 @@ public class LancamentoService {
 		}
 		return lancamentoSalvo;
 	}
-	
-	
+
 }

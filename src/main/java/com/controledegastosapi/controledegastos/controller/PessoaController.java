@@ -57,8 +57,9 @@ public class PessoaController {
 			@RequestParam("pagina") Integer pagina,
 			@RequestParam("termoBase64") String texto,
 			@RequestParam(value = ("codigo"), required = false) Long codigo,
-			@RequestParam(value = ("nome"), required = false) String nome) {
-		return pessoaService.listarPaginado(elementosPorPagina, pagina, codigo, texto);
+			@RequestParam(value = ("nome"), required = false) String nome,
+			@RequestParam(value = ("status"), required = false) String status) {
+		return pessoaService.listarPaginado(elementosPorPagina, pagina, codigo, nome, status);
 	}
 
 	@PutMapping("/{codigo}")

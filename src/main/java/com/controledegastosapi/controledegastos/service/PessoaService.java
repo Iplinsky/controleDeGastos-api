@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.controledegastosapi.controledegastos.model.Pessoa;
+import com.controledegastosapi.controledegastos.model.Status;
 import com.controledegastosapi.controledegastos.repositoy.IPessoaRepository;
 
 @Service
@@ -20,7 +21,7 @@ public class PessoaService {
 	@Autowired
 	private IPessoaRepository pessoaRepository;
 
-	public Pessoa salvar(Pessoa pessoa) { 
+	public Pessoa salvar(Pessoa pessoa) {
 		return pessoaRepository.save(pessoa);
 	}
 
@@ -45,17 +46,23 @@ public class PessoaService {
 		}
 		return pessoaSalva;
 	}
-	
+
 //	Busca paginada ----------------------
-	
-	public Page<Pessoa> listarPaginado(Integer elementosPorPagina, Integer pagina, Long codigo, String nome) {
+
+	public Page<Pessoa> listarPaginado(Integer elementosPorPagina, Integer pagina, Long codigo, String nome,
+			String status) {
 		Pageable pageable = PageRequest.of(pagina - 1, elementosPorPagina);
 		nome = nome == null ? null : "%" + nome.concat("%");
-		return pessoaRepository.findPaginado(codigo, nome, pageable);
+		Status tipoStatus;
+		if (status != null) {
+			tipoStatus = status.equals(Status.ATIVO) ? Status.ATIVO : Status.INATIVO;
+		}
+
+		return pessoaRepository.findPaginado(codigo, nome, status, pageable);
 	}
 
 //	 Codigo de verificação --------------
-	
+
 	public Pessoa verificarPessoaExistente(Long codigo) {
 		Pessoa pessoaSalva = buscarPessoaPeloCodigo(codigo);
 		if (pessoaSalva == null) {
@@ -66,7 +73,7 @@ public class PessoaService {
 
 	public void atualizarPropriedadeAtivo(Long codigo, Boolean ativo) {
 		Pessoa pessoaSalva = buscarPessoaPeloCodigo(codigo);
-		pessoaSalva.setAtivo(ativo);
+		pessoaSalva.setStatus(Status.ATIVO);
 		pessoaRepository.save(pessoaSalva);
 	}
 

@@ -17,8 +17,11 @@ public interface IPessoaRepository extends JpaRepository<Pessoa, Long> {
 	@Query("select a"
 			+ " from Pessoa a"
 			+ " where (a.codigo = :codigo or :codigo is null)"
-			+ "   and (a.nome like :nome or :nome is null)")
-	Page<Pessoa> findPaginado(@Param ("codigo") Long codigo, @Param ("nome") String nome, Pageable pageable);
+			+ " and (a.nome like :nome or :nome is null)"
+			+ " and (a.status = :status")
+	Page<Pessoa> findPaginado(@Param ("codigo") Long codigo, @Param ("nome") String nome, @Param ("status") String status,
+			Pageable pageable);
 	
 	List<Pessoa> findByNomeContaining(String nome);
+	
 }

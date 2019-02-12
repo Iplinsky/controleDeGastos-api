@@ -26,7 +26,7 @@ public class CategoriaService {
 	}
 
 	public Categoria buscarPeloCodigo(Long codigo) {
-		return categoriaRepository.findById(codigo).orElse(null); 
+		return categoriaRepository.findById(codigo).orElse(null);
 	}
 
 	public Categoria save(Categoria categoria) {

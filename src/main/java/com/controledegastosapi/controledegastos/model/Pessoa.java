@@ -5,11 +5,14 @@ import java.io.Serializable;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -28,18 +31,13 @@ public class Pessoa implements Serializable {
 	@Size(min = 2, max = 50)
 	private String nome;
 
-	@NotNull
-	private Boolean ativo;
+	@NotBlank
+	@Enumerated(EnumType.STRING)
+	private Status status;
 
 	@Embedded
 	@Valid
 	private Endereco endereco;
-
-	@JsonIgnore
-	@Transient
-	public Boolean isInativo() {
-		return !this.ativo;
-	}
 
 	public Long getCodigo() {
 		return codigo;
@@ -57,12 +55,13 @@ public class Pessoa implements Serializable {
 		this.nome = nome;
 	}
 
-	public Boolean getAtivo() {
-		return ativo;
+	public Status getStatus() {
+		return status;
 	}
 
-	public void setAtivo(Boolean ativo) {
-		this.ativo = ativo;
+	public boolean setStatus(Status ativo) {
+		this.status = ativo;
+		return true;
 	}
 
 	public Endereco getEndereco() {
@@ -77,9 +76,9 @@ public class Pessoa implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((ativo == null) ? 0 : ativo.hashCode());
 		result = prime * result + ((endereco == null) ? 0 : endereco.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
+		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		return result;
 	}
 
@@ -92,11 +91,6 @@ public class Pessoa implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Pessoa other = (Pessoa) obj;
-		if (ativo == null) {
-			if (other.ativo != null)
-				return false;
-		} else if (!ativo.equals(other.ativo))
-			return false;
 		if (endereco == null) {
 			if (other.endereco != null)
 				return false;
@@ -106,6 +100,11 @@ public class Pessoa implements Serializable {
 			if (other.nome != null)
 				return false;
 		} else if (!nome.equals(other.nome))
+			return false;
+		if (status == null) {
+			if (other.status != null)
+				return false;
+		} else if (!status.equals(other.status))
 			return false;
 		return true;
 	}
