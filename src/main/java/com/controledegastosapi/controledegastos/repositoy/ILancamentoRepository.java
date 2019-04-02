@@ -1,5 +1,7 @@
  package com.controledegastosapi.controledegastos.repositoy;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,21 +15,25 @@ import com.controledegastosapi.controledegastos.model.TipoLancamento;
 @Repository
 public interface ILancamentoRepository extends JpaRepository<Lancamento, Long> {
 
-	@Query("   Select a" + "  From Lancamento a"
+	@Query("select a from Lancamento a "
 			+ " where (a.codigo           = :codigo          or :codigo          = null)"
-			+ "   and (a.tipo             = :tipo            or :tipo            = null)"
-			+ "   and (a.categoria.codigo = :categoriaCodigo or :categoriaCodigo = null)"
-			+ "   and (a.pessoa.codigo    = :pessoaCodigo    or :pessoaCodigo    = null)"
-			+ "   and (a.descricao     like :descricao       or :descricao       = null)"
-			+ "   and (a.descricao     like :texto           or a.categoria.nome like :texto"
-			+ "     or a.pessoa.nome   like :texto           or :texto           = '')")
+			+ " and (a.tipo             = :tipo            or :tipo            = null)"
+			+ " and (a.categoria.codigo = :categoriaCodigo or :categoriaCodigo = null)"
+			+ " and (a.pessoa.codigo    = :pessoaCodigo    or :pessoaCodigo    = null)"
+			+ " and (a.descricao     like :descricao       or :descricao       = null)"
+			+ " and (a.descricao     like :texto           or a.categoria.nome like :texto"
+			+ " or a.pessoa.nome   like :texto           or :texto           = '')")
 	
-	Page<Lancamento> findPaginado(@Param("texto") String texto, @Param("codigo") Long codigo,
+	Page<Lancamento> findPaginado(
+			@Param("texto") String texto,
+			@Param("codigo") Long codigo,
 			@Param("descricao") String descricao, 
 			@Param("tipo") TipoLancamento tipo,
 			@Param("categoriaCodigo") Long categoriaCodigo,
 			@Param("pessoaCodigo") Long pessoaCodigo,
 			Pageable pageable);
 
-//	List<Lancamento> findByNomeContaining(String texto);
+	@Query("SELECT L FROM Lancamento L "
+			+ "WHERE (L.descricao	LIKE 	:descricao	OR 	:descricao	= '')")	
+	List<Lancamento> verificaLancamento(String descricao);
 }

@@ -14,11 +14,20 @@ import com.controledegastosapi.controledegastos.model.Pessoa;
 @Repository
 public interface IPessoaRepository extends JpaRepository<Pessoa, Long> {
 	
-	@Query("select a"
-			+ " from Pessoa a"
-			+ " where (a.codigo = :codigo or :codigo is null)"
-			+ "   and (a.nome like :nome or :nome is null)")
-	Page<Pessoa> findPaginado(@Param ("codigo") Long codigo, @Param ("nome") String nome, Pageable pageable);
+	@Query("select a from Pessoa a "
+			+ "where 	(a.codigo	 	= 		:codigo 	or 		:codigo  = null)"
+			+ "and 		(a.nome 		like 	:nome 		or 		:nome	 =	'' )"
+			+ "and		(a.nome			like	:texto		or		:texto	 =	'' )"
+	)
+	Page<Pessoa> findPaginado(
+			@Param("texto") String texto,
+			@Param ("codigo") Long codigo,
+			@Param ("nome") String nome, 
+			Pageable pageable);
 	
 	List<Pessoa> findByNomeContaining(String nome);
+
+	@Query("SELECT a FROM Pessoa a "
+			+ "WHERE (a.nome	LIKE	:nome	OR	:nome	=  '')")
+	List<Pessoa> buscarPorNome(String nome);
 }

@@ -1,17 +1,14 @@
 package com.controledegastosapi.controledegastos.service;
 
-import java.util.Base64;
-import java.util.List;
-
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.controledegastosapi.controledegastos.ExceptionHandler.PessoaInexistenteOuInativaException;
+import com.controledegastosapi.controledegastos.ExceptionHandler.RegraNegocioException;
 import com.controledegastosapi.controledegastos.model.Lancamento;
 import com.controledegastosapi.controledegastos.model.Pessoa;
 import com.controledegastosapi.controledegastos.model.TipoLancamento;
@@ -36,49 +33,48 @@ public class LancamentoService {
 	}
 
 	public Lancamento atualizar(Long codigo, Lancamento lancamento) {
-		Lancamento lancamentoSalvo = verificarLancamento(codigo);
-		BeanUtils.copyProperties(lancamento, lancamentoSalvo, "codigo");
-		return lancamentoRepository.save(lancamentoSalvo);
-	}
-
-	public List<Lancamento> listarTodos() {
-		return lancamentoRepository.findAll();
+		verificarLancamento(lancamento.getDescricao());
+		return lancamentoRepository.save(lancamento);
 	}
 
 	public Lancamento buscarPeloCodigo(Long codigo) {
 		return lancamentoRepository.findById(codigo).orElse(null);
 	}
 
-	public Page<Lancamento> listarPaginado(int elementosPorPagina, int pagina, String texto, Long codigo,
-			String descricao, String tipo, Long categoriaCodigo, Long pessoaCodigo) {
+	public void remover(Long codigo) {
+		try {
+			lancamentoRepository.deleteById(codigo);	
+		} catch (DataIntegrityViolationException e) {
+			e.getMessage();
+		}		
+	}
+	
+	public Page<Lancamento> listarPaginado(
+			Integer pagina, 
+			Integer elementosPorPagina,			
+			String texto,
+			Long codigo,
+			String descricao,
+			String tipo,
+			Long categoriaCodigo,
+			Long pessoaCodigo) {
+		
 		Pageable pageable = PageRequest.of(pagina - 1, elementosPorPagina);
-		descricao = descricao == null ? descricao : descricao.concat("%");
-		texto = new String(Base64.getDecoder().decode(texto));
 		texto = texto == "" ? texto : "%" + texto + "%";
+		descricao = descricao == null ? "%%" : descricao.concat("%");		
 		TipoLancamento tipoLancamento = null;
+		
 		if (tipo != null) {
 			tipoLancamento = tipo.equals(TipoLancamento.DESPESA.toString()) ? TipoLancamento.RECEITA : TipoLancamento.RECEITA;
 		}
-		return lancamentoRepository.findPaginado(texto, codigo, descricao, tipoLancamento, categoriaCodigo,
-				pessoaCodigo, pageable);
+		return lancamentoRepository.findPaginado(
+				texto, codigo, descricao, tipoLancamento, categoriaCodigo, pessoaCodigo, pageable);
 	}
 
-	public void remover(Long codigo) {
-		lancamentoRepository.deleteById(codigo);
-	}
-
-//	public List<Lancamento> listarPorTermo(String texto) {
-//		texto = new String(Base64.getDecoder().decode(texto));
-//		return lancamentoRepository.findByNomeContaining(texto);
-//	}
-
-	private Lancamento verificarLancamento(Long codigo) {
-		Lancamento lancamentoSalvo = buscarPeloCodigo(codigo);
-		if (lancamentoSalvo == null) {
-			throw new EmptyResultDataAccessException(1);
+	private void verificarLancamento(String descricao) {
+		if (lancamentoRepository.verificaLancamento(descricao).isEmpty()) {
+			throw new RegraNegocioException(
+					String.format("O sistema já possui um registro com {%s} informado!", descricao));
 		}
-		return lancamentoSalvo;
-	}
-	
-	
+	}	
 }

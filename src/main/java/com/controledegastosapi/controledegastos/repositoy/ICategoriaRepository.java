@@ -14,13 +14,18 @@ import com.controledegastosapi.controledegastos.model.Categoria;
 @Repository
 public interface ICategoriaRepository extends JpaRepository<Categoria, Long> {
 	
-	@Query("select a"
-			+ " from Categoria a"
-			+ " where (a.codigo = :codigo or :codigo is null)"
-			+ "   and (a.nome like :nome or :nome is null)")
-	Page<Categoria> findPaginado(@Param("codigo") Long codigo,@Param("nome") String nome, Pageable pageable);
+	@Query("select a from Categoria a "
+			+ "where (a.codigo	 = 		 :codigo  or 	:codigo 	is 	null) "
+			+ "and   (a.nome 	 like	 :nome	  or 	:nome		= 	 '' )"
+	)
+	Page<Categoria> findPaginado(
+			@Param("codigo") Long codigo,
+			@Param("nome") String nome,
+			Pageable pageable);	
 	
-	List<Categoria> findByNome(String nome);
+	@Query("SELECT n FROM Categoria n "
+			+ "WHERE (n.nome	LIKE	:nome	or	:nome	=  '')")
+	List<Categoria> buscarPorNomeDaCategoria(String nome);
 	
 	List<Categoria> findByNomeContaining(String nome);
 }

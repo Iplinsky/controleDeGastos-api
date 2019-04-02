@@ -3,6 +3,7 @@ package com.controledegastosapi.controledegastos.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,6 +51,14 @@ public class Lancamento implements Serializable {
 	private Pessoa pessoa;
 
 	@NotNull
+	@Column(name = "DAT_CRIACAO")
+	private LocalDateTime datCriacao;
+
+	@NotNull
+	@Column(name = "DAT_ALTERACAO")
+	private LocalDateTime datAlteracao;
+
+	@NotNull
 	private BigDecimal valor;
 
 	private String observacao;
@@ -68,6 +77,22 @@ public class Lancamento implements Serializable {
 
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
+	}
+
+	public LocalDateTime getDatCriacao() {
+		return datCriacao;
+	}
+
+	public void setDatCriacao(LocalDateTime datCriacao) {
+		this.datCriacao = datCriacao;
+	}
+
+	public LocalDateTime getDatAlteracao() {
+		return datAlteracao;
+	}
+
+	public void setDatAlteracao(LocalDateTime datAlteracao) {
+		this.datAlteracao = datAlteracao;
 	}
 
 	public LocalDate getDataVencimento() {

@@ -3,14 +3,15 @@ package com.controledegastosapi.controledegastos.service;
 import java.util.Base64;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.controledegastosapi.controledegastos.ExceptionHandler.RegraNegocioException;
 import com.controledegastosapi.controledegastos.model.Pessoa;
 import com.controledegastosapi.controledegastos.repositoy.IPessoaRepository;
 
@@ -21,21 +22,21 @@ public class PessoaService {
 	private IPessoaRepository pessoaRepository;
 
 	public Pessoa salvar(Pessoa pessoa) { 
+		verificarPessoaExistente(pessoa.getNome());
+		return pessoaRepository.save(pessoa);
+	}
+	
+	public Pessoa atualizar(Long codigo, Pessoa pessoa) {
+		verificarPessoaExistente(pessoa.getNome());
 		return pessoaRepository.save(pessoa);
 	}
 
-	public List<Pessoa> listarTodos() {
-		return pessoaRepository.findAll();
-	}
-
-	public Pessoa atualizar(Long codigo, Pessoa pessoa) {
-		Pessoa pessoaSalva = verificarPessoaExistente(codigo);
-		BeanUtils.copyProperties(pessoa, pessoaSalva, "codigo");
-		return pessoaRepository.save(pessoaSalva);
-	}
-
 	public void remover(Long codigo) {
-		pessoaRepository.deleteById(codigo);
+		try {
+			pessoaRepository.deleteById(codigo);	
+		} catch (DataIntegrityViolationException e) {
+			e.getMessage();
+		}
 	}
 
 	public Pessoa buscarPessoaPeloCodigo(Long codigo) {
@@ -48,20 +49,27 @@ public class PessoaService {
 	
 //	Busca paginada ----------------------
 	
-	public Page<Pessoa> listarPaginado(Integer elementosPorPagina, Integer pagina, Long codigo, String nome) {
-		Pageable pageable = PageRequest.of(pagina - 1, elementosPorPagina);
-		nome = nome == null ? null : "%" + nome.concat("%");
-		return pessoaRepository.findPaginado(codigo, nome, pageable);
+	public Page<Pessoa> listarPaginado (
+			Integer pagina,
+			Integer elementosPorPagina,		
+			String texto,
+			Long codigo,
+			String nome) {
+		
+		Pageable pageable = PageRequest.of(pagina - 1, elementosPorPagina);		
+		texto = texto == "" ? texto : "%" + texto + "%";
+		nome = nome == null ? "%%" : "%" + nome.concat("%");
+		
+		return pessoaRepository.findPaginado(texto, codigo, nome, pageable);
 	}
 
 //	 Codigo de verificação --------------
 	
-	public Pessoa verificarPessoaExistente(Long codigo) {
-		Pessoa pessoaSalva = buscarPessoaPeloCodigo(codigo);
-		if (pessoaSalva == null) {
-			throw new EmptyResultDataAccessException(1);
+	public void verificarPessoaExistente(String nome) {
+		if (!pessoaRepository.buscarPorNome(nome).isEmpty()) {
+			throw new RegraNegocioException(
+					String.format("O sistema já possui um registro com {%s} informado.", nome));
 		}
-		return pessoaSalva;
 	}
 
 	public void atualizarPropriedadeAtivo(Long codigo, Boolean ativo) {
